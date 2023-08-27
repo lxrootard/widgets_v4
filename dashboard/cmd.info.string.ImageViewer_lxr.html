@@ -1,0 +1,26 @@
+<div class="cmd cmd-widget #history#" style="width:100%;height:unset!important;" data-type="info" data-subtype="numeric" data-template="tmplmultistate"
+data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+  <div class="title #hide_name#">
+      <span class="cmdName">#name_display#</span>
+  </div>
+  <div class="data" style="position:relative; margin-top:10px;">
+        		<span class="value" style="font-size: 2em;" data-type="info"></span>
+        		<span class="unit" style="font-size: 1em;">#unite#</span>
+  </div>
+  <div class="imageCmd" style="position:relative; margin-top:0px"></div>
+  <div class="timeCmd #history#" style="position:relative;font-size:10px;font-weight:normal;margin-top:0px"></div>
+    <script> 
+      jeedom.cmd.addUpdateFunction('#id#',function(_options)
+      { 
+        // Parametrage des images
+        var image = _options.display_value;	
+        var cmd = $('.cmd[data-cmd_id=#id#]'); 
+        cmd.find('.imageCmd').empty().append('<img src="' + image + '" style="width:200px;">'); 
+        // maj du temps depuis dernier refresh page
+        jeedom.cmd.displayDuration(_options.valueDate, cmd.find('.timeCmd'));
+        // maj du tooltips
+        cmd.attr('title','{{valeur du}} : '+_options.valueDate+'<br/>{{collectée le}} : '+_options.collectDate);
+      });
+      jeedom.cmd.refreshValue([{cmd_id :'#id#',display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'}]);
+    </script>
+</div>
