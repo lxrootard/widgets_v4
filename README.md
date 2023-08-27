@@ -2,12 +2,12 @@
 
 ## Image Viewer
 
-![Preview](./dashboard/cmd.info.string.ImageViewer_lxr/ImageViewer_preview.png)
+![Preview](dashboard/cmd.info.string.ImageViewer_lxr/ImageViewer_preview.png)
 
 <p>
 Widget to display an image from an URL command
 <br>
-[Get the code](./dashboard/cmd.info.string.ImageViewer_lxr.html)
+Get the [code](dashboard/cmd.info.string.ImageViewer_lxr.html)
 
 
 ## Installation
