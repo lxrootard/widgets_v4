@@ -1,0 +1,104 @@
+<div class="tooltips cmd cmd-widget #history#" style="min-height:35px" data-type="info" data-subtype="numeric" data-cmd_id="#id#" 
+      data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#" style="display:block;">
+	<div class="title #hide_name#">
+		<div class="cmdName">#name_display#</div>
+	</div>
+  	<center>
+    	    <div class="data" style="position:relative; margin-top:10px;">
+        	<span class="value" style="font-size: 2em;" data-type="info"></span>
+        	<span class="unit" style="font-size: 1em;"> #unite# </span>
+		</div>
+       	    <div class="timeCmd  #history#" style="position:relative; margin-bottom:5px; font-size:10px;font-weight:normal"></div>      
+            <div class="graph#id#" style="width: 400px; height: 400px;"></div>
+  	</center>
+     <script>
+     function barChart (graph,categories_x,title_g,title_y,unit_y,serie_data,serie_name,serie_color) {
+      var fmt = '{value} '+ unit_y;
+      var unite = ' ' + unit_y;
+      graph.highcharts({
+        credits: {
+    		enabled: false
+		},
+        chart: {
+            type: 'column', // bar pour graphiques horizontaux, pie pour des graphiques en camembert
+        },
+        title: {
+            text: title_g, // Titre du graphique
+          	style: { 'color': 'var(--txt-color)', 'fontSize': '14px' }
+        },
+        xAxis: { 
+          	categories: categories_x,  // labels axe X > ID du dableau des dates
+          	labels: {
+        //    	rotation: -45, 
+          		style: {
+                	fontSize: '10px',
+            	} 
+           } 
+        },
+        yAxis: {
+            title: {
+                text: title_y // titre de l'axe Y
+            },
+          	labels: {
+            format: fmt // format tooltip
+        	}
+        },
+        // Les données du graphique
+        series: [{
+            name: serie_name, // nom de la série (Y)
+            data: serie_data,     
+          	color: serie_color, // couleur de la série
+            tooltip: {
+            	valueSuffix: unite
+        		}
+        	}]
+    	 });
+     }
+
+    jeedom.cmd.addUpdateFunction('#id#',function(_options) {
+        var serie_title = ('#serie_title#' !='#' + 'serie_title#') ? "#serie_title#":"#name_display#"; // valeurs en Y 
+		var serie_name = ('#serie_name#' !='#' + 'serie_name#') ? "#serie_name#": "Historique "+"#name_display#"; // nom de la série
+        var graph_title = ('#graph_title#' !='#' + 'graph_title#') ? "#graph_title#": ''; // titre du graphique
+      	var serie_unit = '#unite#'; // unite axe Y
+        var max_days = isNaN('#nb_values#')? 30 : parseInt('#max_days#'); // les N dernières jours, max 30
+        var nb_values = isNaN('#nb_values#')? 10 : parseInt('#nb_values#'); // les N dernières valeurs, max 10
+
+      	var serie_color = ('#serie_color#' !='#' + 'serie_color#') ? "#serie_color#": '';
+        var hide = ('#hide_value#' != '#' + 'hide_value#') ? true : false; // masquer la valeur
+        var cmd = $('.cmd[data-cmd_id=#id#]');      
+      	var start = moment().subtract(max_days, 'days').startOf('day').format('YYYY-MM-DD 00:00:00');
+    	var stop = moment().format('YYYY-MM-DD 23:59:59');
+        var dates = [];
+        var serie_data = [];
+        if (hide) {
+          	cmd.find('.data').hide();
+            cmd.find('.timeCmd').hide();
+    	} else {
+          	cmd.find('.data').show();
+          	cmd.find('.timeCmd').show();
+            var state = parseFloat(_options.display_value);	
+            cmd.find('.value').empty().append(state);
+            jeedom.cmd.displayDuration(_options.valueDate,  cmd.find('.timeCmd'));
+        }
+        jeedom.history.get({
+        			cmd_id: #id#,
+        			dateStart : start,
+        			dateEnd : stop,
+        			error: function (error) {
+                      			alert('error: ' + error);
+        			},
+        			success: function (hist) {
+                      const k = isNaN(nb_values) ? 0: hist.data.length-nb_values;
+                      for(let i = k; i<hist.data.length; i++) {
+                          	dates.push (new Date(hist.data[i][0]).toLocaleString('fr-FR', 
+                                        { dateStyle:'short', timeStyle: 'short', timeZone: 'UTC' }));
+                            serie_data.push(hist.data[i][1]);
+                      }
+                      var graph = cmd.find('.graph'+ #id#);
+                      barChart(graph,dates,graph_title, serie_title,serie_unit,serie_data,serie_name,serie_color);    
+        			}
+    	}); 
+     });
+     jeedom.cmd.refreshValue([{cmd_id :'#id#',display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'}]);
+    </script>
+</div>
