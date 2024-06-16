@@ -1,16 +1,16 @@
 <div class="tooltips cmd cmd-widget #history#" style="min-height:35px" data-type="info" data-subtype="numeric" data-cmd_id="#id#" 
       data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#" style="display:block;">
-	<div class="title #hide_name#">
-		<div class="cmdName">#name_display#</div>
-	</div>
-  	<center>
-    	    <div class="data" style="position:relative; margin-top:10px;">
+     <div class="title #hide_name#">
+	<div class="cmdName">#name_display#</div>
+     </div>
+     <center>
+	<div class="data" style="position:relative; margin-top:10px;">
         	<span class="value" style="font-size: 2em;" data-type="info"></span>
         	<span class="unit" style="font-size: 1em;"> #unite# </span>
-		</div>
-       	    <div class="timeCmd  #history#" style="position:relative; margin-bottom:5px; font-size:10px;font-weight:normal"></div>      
-            <div class="graph#id#" style="width: 400px; height: 400px;"></div>
-  	</center>
+	</div>
+	<div class="timeCmd  #history#" style="position:relative; margin-bottom:5px; font-size:10px;font-weight:normal"></div>
+	<div class="graph#id#" style="width: 400px; height: 400px;"></div>
+     </center>
      <script>
      function barChart (graph,categories_x,title_g,title_y,unit_y,serie_data,serie_name,serie_color) {
       var fmt = '{value} '+ unit_y;
@@ -60,7 +60,7 @@
 		var serie_name = ('#serie_name#' !='#' + 'serie_name#') ? "#serie_name#": "Historique "+"#name_display#"; // nom de la série
         var graph_title = ('#graph_title#' !='#' + 'graph_title#') ? "#graph_title#": ''; // titre du graphique
       	var serie_unit = '#unite#'; // unite axe Y
-        var max_days = isNaN('#nb_values#')? 30 : parseInt('#max_days#'); // les N dernières jours, max 30
+        var max_days = isNaN('#max_days#')? 30 : parseInt('#max_days#'); // les N derniers jours, max 30
         var nb_values = isNaN('#nb_values#')? 10 : parseInt('#nb_values#'); // les N dernières valeurs, max 10
 
       	var serie_color = ('#serie_color#' !='#' + 'serie_color#') ? "#serie_color#": '';
@@ -85,17 +85,21 @@
         			dateStart : start,
         			dateEnd : stop,
         			error: function (error) {
-                      			alert('error: ' + error);
+                      alert('error: ' + error);
         			},
         			success: function (hist) {
-                      const k = isNaN(nb_values) ? 0: hist.data.length-nb_values;
-                      for(let i = k; i<hist.data.length; i++) {
-                          	dates.push (new Date(hist.data[i][0]).toLocaleString('fr-FR', 
-                                        { dateStyle:'short', timeStyle: 'short', timeZone: 'UTC' }));
-                            serie_data.push(hist.data[i][1]);
-                      }
-                      var graph = cmd.find('.graph'+ #id#);
-                      barChart(graph,dates,graph_title, serie_title,serie_unit,serie_data,serie_name,serie_color);    
+                      if (hist.data && hist.data.length > 0) {
+                        const k = (hist.data.length > nb_values) ? hist.data.length - nb_values: 0;
+                         for(let i = k; i<hist.data.length; i++) {
+                           if (hist.data[i] && hist.data[i].length > 1) {
+                              dates.push (new Date(hist.data[i][0]).toLocaleString('fr-FR', 
+                                          { dateStyle:'short', timeStyle: 'short', timeZone: 'UTC' }));
+                              serie_data.push(hist.data[i][1]);
+                           }
+                          }
+                        var graph = cmd.find('.graph'+ #id#);
+                        barChart(graph,dates,graph_title, serie_title,serie_unit,serie_data,serie_name,serie_color);    
+                       }
         			}
     	}); 
      });
